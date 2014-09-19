@@ -599,34 +599,11 @@ admin_user = ${NOVA_SERVICE_USER}
 admin_password = ${NOVA_SERVICE_PASS}
 
 [cells]
-
-driver=nova.cells.rpc_driver.CellsRPCDriver
-instance_updated_at_threshold=3600
-instance_update_num_instances=1
-max_hop_count=10
-scheduler=nova.cells.scheduler.CellsScheduler
 enable=true
-topic=cells
-manager=nova.cells.manager.CellsManager
-call_timeout=60
-reserve_percent=10.0
-rpc_driver_queue_base=cells.intercell
-scheduler_filter_classes=nova.cells.filters.all_filters
-scheduler_weight_classes=nova.cells.weights.all_weighers
-scheduler_retries=10
-scheduler_retry_delay=2
-db_check_interval=60
-ram_weight_multiplier=10.0
-offset_weight_multiplier=1.0
-
-#mute_child_interval=300
-#capabilities=hypervisor=xenserver;kvm,os=linux;windows
-#cells_config=<None>
-#mute_weight_multiplier=-10.0
-#mute_weight_value=1000.0
-
-name=api
+scheduler_filter_classes=nova.cells.filters.target_cell.TargetCellFilter,nova.cells.filters.image_properties.ImagePropertiesFilter
 cell_type=api
+compute_api_class=nova.compute.cells_api.ComputeCellsAPI
+scheduler_topic=cells
 EOF
 
 sudo chmod 0640 $NOVA_CONF
@@ -664,7 +641,7 @@ sudo sed -i "s@LOGOUT_URL.*@LOGOUT_URL='/auth/logout/'@g" /etc/openstack-dashboa
 sudo sed -i "s@LOGIN_REDIRECT_URL.*@LOGIN_REDIRECT_URL='/'@g" /etc/openstack-dashboard/local_settings.py
 
 # Apache Conf
-cat > /etc/apache2/conf-enabled/openstack-dashboard.conf << EOF
+cat > /etc/apache2/conf-enabled/openstack-dashboard.conf <<EOF
 WSGIScriptAlias / /usr/share/openstack-dashboard/openstack_dashboard/wsgi/django.wsgi
 WSGIDaemonProcess horizon user=horizon group=horizon processes=3 threads=10
 WSGIProcessGroup horizon
@@ -685,7 +662,7 @@ export OS_PASSWORD=openstack
 export OS_AUTH_URL=http://${MY_IP}:5000/v2.0/
 EOF
 
-#nova-manage cell create --name=api --cell_type=parent --username=guest --password=guest --hostname=172.16.0.101 --port=5672 --virtual_host=/ --woffset=1.0 --wscale=1.0
+nova-manage cell create --name=api --cell_type=parent --username=guest --password=guest --hostname=172.16.0.101 --port=5672 --virtual_host=/ --woffset=1.0 --wscale=1.0
 nova-manage cell create --name=c1 --cell_type=child --username=guest --password=guest --hostname=172.16.0.102 --port=5672 --virtual_host=/ --woffset=1.0 --wscale=1.0
 
 sudo stop nova-cells

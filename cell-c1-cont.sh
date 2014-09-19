@@ -127,7 +127,7 @@ keystone service-create --name keystone --type identity --description 'OpenStack
 # OpenStack Compute Nova API
 NOVA_SERVICE_ID=$(keystone service-list | awk '/\ nova\ / {print $2}')
 
-PUBLIC="http://$ENDPOINT:8774/v2/\$(tenant_id)s"
+PUBLIC="http://$API_CONTROLLER:8774/v2/\$(tenant_id)s"
 ADMIN=$PUBLIC
 INTERNAL=$PUBLIC
 
@@ -136,8 +136,8 @@ keystone endpoint-create --region regionOne --service_id $NOVA_SERVICE_ID --publ
 # OpenStack Compute EC2 API
 EC2_SERVICE_ID=$(keystone service-list | awk '/\ ec2\ / {print $2}')
 
-PUBLIC="http://$ENDPOINT:8773/services/Cloud"
-ADMIN="http://$ENDPOINT:8773/services/Admin"
+PUBLIC="http://$API_CONTROLLER:8773/services/Cloud"
+ADMIN="http://$API_CONTROLLER:8773/services/Admin"
 INTERNAL=$PUBLIC
 
 keystone endpoint-create --region regionOne --service_id $EC2_SERVICE_ID --publicurl $PUBLIC --adminurl $ADMIN --internalurl $INTERNAL
@@ -410,7 +410,7 @@ mysql -uroot -p$MYSQL_ROOT_PASS -e 'CREATE DATABASE nova;'
 mysql -uroot -p$MYSQL_ROOT_PASS -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY '$MYSQL_NOVA_PASS';"
 mysql -uroot -p$MYSQL_ROOT_PASS -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY '$MYSQL_NOVA_PASS';"
 
-sudo apt-get -y install rabbitmq-server nova-novncproxy novnc nova-api nova-conductor nova-scheduler nova-cells nova-ajax-console-proxy nova-cert nova-consoleauth nova-doc python-novaclient dnsmasq nova-objectstore
+sudo apt-get -y install rabbitmq-server nova-novncproxy novnc nova-conductor nova-scheduler nova-cells nova-ajax-console-proxy nova-cert nova-consoleauth nova-doc python-novaclient dnsmasq nova-objectstore
 
 # Clobber the nova.conf file with the following
 NOVA_CONF=/etc/nova/nova.conf
@@ -513,35 +513,17 @@ admin_tenant_name = ${SERVICE_TENANT}
 admin_user = ${NOVA_SERVICE_USER}
 admin_password = ${NOVA_SERVICE_PASS}
 
-[cells]
  
-driver=nova.cells.rpc_driver.CellsRPCDriver
-instance_updated_at_threshold=3600
-instance_update_num_instances=1
-max_hop_count=10
-scheduler=nova.cells.scheduler.CellsScheduler
-enable=true
-topic=cells
-manager=nova.cells.manager.CellsManager
-call_timeout=60
-reserve_percent=10.0
-rpc_driver_queue_base=cells.intercell
-scheduler_filter_classes=nova.cells.filters.all_filters
-scheduler_weight_classes=nova.cells.weights.all_weighers
-scheduler_retries=10
-scheduler_retry_delay=2
-db_check_interval=60
-ram_weight_multiplier=10.0
-offset_weight_multiplier=1.0
-
-#mute_child_interval=300
-#capabilities=hypervisor=xenserver;kvm,os=linux;windows
-#cells_config=<None>
-#mute_weight_multiplier=-10.0
-#mute_weight_value=1000.0
-
+[cells]
 name=c1
+instance_updated_at_threshold=86400
+enable=true
+scheduler_filter_classes=nova.cells.filters.target_cell.TargetCellFilter,nova.cells.filters.image_properties.ImagePropertiesFilter
+instance_update_num_instances=75
+reserve_percent=0.0
+#capabilities=flavor_classes=standard1;performance1;performance2;memory1;compute1
 cell_type=compute
+offset_weight_multiplier=100
 EOF
 
 sudo chmod 0640 $NOVA_CONF
@@ -549,17 +531,17 @@ sudo chown nova:nova $NOVA_CONF
 
 sudo nova-manage db sync
 
-sudo stop nova-api
 sudo stop nova-cells
 sudo stop nova-novncproxy
 sudo stop nova-consoleauth
 sudo stop nova-cert
+sudo stop nova-scheduler
 
-sudo start nova-api
 sudo start nova-cells
 sudo start nova-cert
 sudo start nova-consoleauth
 sudo start nova-novncproxy
+sudo start nova-scheduler
 
 nova-manage cell create --name=api --cell_type=parent --username=guest --password=guest --hostname=172.16.0.101 --port=5672 --virtual_host=/ --woffset=1.0 --wscale=1.0
 

@@ -13,7 +13,6 @@ neutron net-create \
     --tenant-id ${TENANT_ID} \
     cookbook_network_1
 
-
 neutron subnet-create \
     --tenant-id ${TENANT_ID} \
     --name cookbook_subnet_1 \

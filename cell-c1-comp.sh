@@ -2,7 +2,7 @@ source /vagrant/common.sh
 
 # Cell C2 Compute Build
 export CONTROLLER_HOST=172.16.0.102
-export API_CONTROLLER=172.16.0.103
+export API_CONTROLLER=172.16.0.101
 
 export GLANCE_HOST=${CONTROLLER_HOST}
 export MYSQL_HOST=${CONTROLLER_HOST}
