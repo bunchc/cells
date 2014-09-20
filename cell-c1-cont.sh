@@ -544,6 +544,7 @@ sudo start nova-novncproxy
 sudo start nova-scheduler
 
 nova-manage cell create --name=api --cell_type=parent --username=guest --password=guest --hostname=172.16.0.101 --port=5672 --virtual_host=/ --woffset=1.0 --wscale=1.0
+#nova-manage cell create --name=c1 --cell_type=child --username=guest --password=guest --hostname=172.16.0.102 --port=5672 --virtual_host=/ --woffset=1.0 --wscale=1.0
 
 sudo stop nova-cells
 sudo start nova-cells
