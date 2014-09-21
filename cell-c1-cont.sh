@@ -127,7 +127,7 @@ keystone service-create --name keystone --type identity --description 'OpenStack
 # OpenStack Compute Nova API
 NOVA_SERVICE_ID=$(keystone service-list | awk '/\ nova\ / {print $2}')
 
-PUBLIC="http://$API_CONTROLLER:8774/v2/\$(tenant_id)s"
+PUBLIC="http://$ENDPOINT:8774/v2/\$(tenant_id)s"
 ADMIN=$PUBLIC
 INTERNAL=$PUBLIC
 
@@ -136,8 +136,8 @@ keystone endpoint-create --region regionOne --service_id $NOVA_SERVICE_ID --publ
 # OpenStack Compute EC2 API
 EC2_SERVICE_ID=$(keystone service-list | awk '/\ ec2\ / {print $2}')
 
-PUBLIC="http://$API_CONTROLLER:8773/services/Cloud"
-ADMIN="http://$API_CONTROLLER:8773/services/Admin"
+PUBLIC="http://$ENDPOINT:8773/services/Cloud"
+ADMIN="http://$ENDPOINT:8773/services/Admin"
 INTERNAL=$PUBLIC
 
 keystone endpoint-create --region regionOne --service_id $EC2_SERVICE_ID --publicurl $PUBLIC --adminurl $ADMIN --internalurl $INTERNAL

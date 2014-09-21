@@ -102,7 +102,7 @@ auth_strategy = keystone
 # The messaging module to use, defaults to kombu.
 rpc_backend = neutron.openstack.common.rpc.impl_kombu
 
-rabbit_host = ${CONTROLLER_HOST}
+rabbit_host = ${API_CONTROLLER}
 rabbit_password = guest
 rabbit_port = 5672
 rabbit_userid = guest
@@ -261,7 +261,16 @@ admin_tenant_name = ${SERVICE_TENANT}
 admin_user = ${NOVA_SERVICE_USER}
 admin_password = ${NOVA_SERVICE_PASS}
 
-
+[cells]
+name=c1
+instance_updated_at_threshold=86400
+enable=true
+scheduler_filter_classes=nova.cells.filters.target_cell.TargetCellFilter,nova.cells.filters.image_properties.ImagePropertiesFilter
+instance_update_num_instances=75
+reserve_percent=0.0
+#capabilities=flavor_classes=standard1;performance1;performance2;memory1;compute1
+cell_type=compute
+offset_weight_multiplier=100
 EOF
 
 sudo chmod 0640 $NOVA_CONF
