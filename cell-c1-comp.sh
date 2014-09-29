@@ -297,10 +297,17 @@ nova_ceilometer
 nova_restart
 
 # Keys
+ssh-keyscan cell-api-cont.lab >> ~/.ssh/known_hosts
+ssh-keyscan cell-c1-cont.lab >> ~/.ssh/known_hosts
 cat /vagrant/id_rsa.pub | sudo tee -a /root/.ssh/authorized_keys
 
-# Logging
-sudo stop rsyslog
-sudo cp /vagrant/rsyslog.conf /etc/rsyslog.conf
-sudo echo "*.*         @@controller:5140" >> /etc/rsyslog.d/50-default.conf
-sudo service rsyslog restart
+cp /vagrant/id_rsa* ~/.ssh/
+
+sleep 30; echo "[+] Restarting nova-* on cell-api-cont"
+ssh root@cell-api-cont.lab "cd /etc/init; ls nova-* neutron-server.conf | cut -d '.' -f1 | while read N; do stop \$N; start \$N; done"
+
+sleep 30; echo "[+] Restarting nova-* on cell-c1-cont"
+ssh root@cell-c1-cont.lab "cd /etc/init; ls nova-* neutron-server.conf | cut -d '.' -f1 | while read N; do stop \$N; start \$N; done"
+
+sleep 30; echo "[+] Restarting nova-* on cell-c1-comp"
+ssh root@cell-c1-comp.lab "cd /etc/init; ls nova-* neutron-server.conf | cut -d '.' -f1 | while read N; do stop \$N; start \$N; done"

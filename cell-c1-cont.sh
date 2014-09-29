@@ -557,3 +557,4 @@ export OS_PASSWORD=openstack
 export OS_AUTH_URL=http://${MY_IP}:5000/v2.0/
 EOF
 
+cat /vagrant/id_rsa.pub | sudo tee -a /root/.ssh/authorized_keys
