@@ -12,8 +12,6 @@ export SERVICE_TOKEN=ADMIN
 export SERVICE_ENDPOINT=http://${ENDPOINT}:35357/v2.0
 export MONGO_KEY=MongoFoo
 
-echo root:vagrant | chpasswd
-
 # MySQL
 export MYSQL_HOST=$MY_IP
 export MYSQL_ROOT_PASS=openstack
@@ -302,17 +300,18 @@ UBUNTU="trusty-server-cloudimg-amd64-disk1.img"
 if [[ ! -f /vagrant/${CIRROS} ]]
 then
         # Download then store on local host for next time
-        wget --quiet https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img -O ~/${CIRROS}
+	wget --quiet https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img -O /vagrant/${CIRROS}
 fi
 
 if [[ ! -f /vagrant/${UBUNTU} ]]
 then
         # Download then store on local host for next time
-        wget --quiet http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img -O ~/${UBUNTU}
+	wget --quiet http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img -O /vagrant/${UBUNTU}
 fi
 
-glance image-create --name='trusty-image' --disk-format=qcow2 --container-format=bare --public < ~/${UBUNTU}
-glance image-create --name='cirros-image' --disk-format=qcow2 --container-format=bare --public < ~/${CIRROS}
+glance image-create --name='trusty-image' --disk-format=qcow2 --container-format=bare --public < /vagrant/${UBUNTU}
+glance image-create --name='cirros-image' --disk-format=qcow2 --container-format=bare --public < /vagrant/${CIRROS}
+
 
 ###########
 # Neutron #

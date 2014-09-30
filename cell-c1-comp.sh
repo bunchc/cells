@@ -4,7 +4,7 @@ source /vagrant/common.sh
 export CONTROLLER_HOST=172.16.0.102
 export API_CONTROLLER=172.16.0.101
 
-export GLANCE_HOST=${CONTROLLER_HOST}
+export GLANCE_HOST=${API_CONTROLLER}
 export MYSQL_HOST=${CONTROLLER_HOST}
 export KEYSTONE_ENDPOINT=${CONTROLLER_HOST}
 export MYSQL_NEUTRON_PASS=openstack
@@ -227,7 +227,7 @@ iscsi_ip_address=${CONTROLLER_HOST}
 
 # Images
 image_service=nova.image.glance.GlanceImageService
-glance_api_servers=${GLANCE_HOST}:9292
+glance_api_servers=${API_CONTROLLER}:9292
 
 # Scheduler
 scheduler_default_filters=AllHostsFilter
