@@ -1,4 +1,5 @@
 source /vagrant/common.sh
+echo root:vagrant | chpasswd
 
 # Cell C2 Compute Build
 export CONTROLLER_HOST=172.16.0.102
@@ -296,18 +297,36 @@ nova_configure
 nova_ceilometer
 nova_restart
 
-# Keys
-ssh-keyscan cell-api-cont.lab >> ~/.ssh/known_hosts
-ssh-keyscan cell-c1-cont.lab >> ~/.ssh/known_hosts
+apt-get install -y expect
+
+sudo ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa
+rm -f /vagrant/id_rsa*
+sudo cp /root/.ssh/id_rsa /vagrant
+sudo cp /root/.ssh/id_rsa.pub /vagrant
 cat /vagrant/id_rsa.pub | sudo tee -a /root/.ssh/authorized_keys
 
-cp /vagrant/id_rsa* ~/.ssh/
+ssh-keyscan cell-api-cont.lab >> ~/.ssh/known_hosts
+ssh-keyscan cell-c1-cont.lab >> ~/.ssh/known_hosts
 
-sleep 30; echo "[+] Restarting nova-* on cell-api-cont"
+expect<<EOF
+spawn ssh-copy-id cell-api-cont.lab
+expect "root@cell-api-cont.lab's password:"
+send "vagrant\n"
+expect eof
+EOF
+
+expect<<EOF
+spawn ssh-copy-id cell-c1-cont.lab
+expect "root@cell-c1-cont.lab's password:"
+send "vagrant\n"
+expect eof
+EOF
+
+echo "[+] Restarting nova-* on cell-api-cont"
 ssh root@cell-api-cont.lab "cd /etc/init; ls nova-* neutron-server.conf | cut -d '.' -f1 | while read N; do stop \$N; start \$N; done"
 
 sleep 30; echo "[+] Restarting nova-* on cell-c1-cont"
 ssh root@cell-c1-cont.lab "cd /etc/init; ls nova-* neutron-server.conf | cut -d '.' -f1 | while read N; do stop \$N; start \$N; done"
 
 sleep 30; echo "[+] Restarting nova-* on cell-c1-comp"
-ssh root@cell-c1-comp.lab "cd /etc/init; ls nova-* neutron-server.conf | cut -d '.' -f1 | while read N; do stop \$N; start \$N; done"
+cd /etc/init; ls nova-* neutron-server.conf | cut -d '.' -f1 | while read N; do stop $N; start $N; done

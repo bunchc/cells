@@ -12,7 +12,7 @@ export SERVICE_TOKEN=ADMIN
 export SERVICE_ENDPOINT=http://${ENDPOINT}:35357/v2.0
 export MONGO_KEY=MongoFoo
 
-#export LANG=C
+echo root:vagrant | chpasswd
 
 # MySQL
 export MYSQL_HOST=$MY_IP
@@ -662,15 +662,6 @@ export OS_USERNAME=admin
 export OS_PASSWORD=openstack
 export OS_AUTH_URL=http://${MY_IP}:5000/v2.0/
 EOF
-
-# SSH Keys
-sudo ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa
-rm -f /vagrant/id_rsa*
-sudo cp /root/.ssh/id_rsa /vagrant
-sudo cp /root/.ssh/id_rsa.pub /vagrant
-cat /vagrant/id_rsa.pub | sudo tee -a /root/.ssh/authorized_keys 
-
-
 
 #nova-manage cell create --name=api --cell_type=parent --username=guest --password=guest --hostname=172.16.0.101 --port=5672 --virtual_host=/ --woffset=1.0 --wscale=1.0
 nova-manage cell create --name=c1 --cell_type=child --username=guest --password=guest --hostname=172.16.0.102 --port=5672 --virtual_host=/ --woffset=1.0 --wscale=1.0
