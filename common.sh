@@ -1,5 +1,8 @@
-
 sudo apt-get update && apt-get upgrade -y
+
+echo root:vagrant | chpasswd
+sudo sed -i "s/PermitRootLogin without-password/PermitRootLogin yes/g" /etc/ssh/sshd_config
+restart ssh
 
 echo "
 # CookbookHosts

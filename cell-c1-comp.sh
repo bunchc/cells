@@ -1,5 +1,4 @@
 source /vagrant/common.sh
-echo root:vagrant | chpasswd
 
 # Cell C2 Compute Build
 export CONTROLLER_HOST=172.16.0.102
@@ -305,8 +304,8 @@ sudo cp /root/.ssh/id_rsa /vagrant
 sudo cp /root/.ssh/id_rsa.pub /vagrant
 cat /vagrant/id_rsa.pub | sudo tee -a /root/.ssh/authorized_keys
 
-ssh-keyscan cell-api-cont.lab >> ~/.ssh/known_hosts
-ssh-keyscan cell-c1-cont.lab >> ~/.ssh/known_hosts
+ssh-keyscan cell-api-cont.lab >> /root/.ssh/known_hosts
+ssh-keyscan cell-c1-cont.lab >> /root/.ssh/known_hosts
 
 expect<<EOF
 spawn ssh-copy-id cell-api-cont.lab

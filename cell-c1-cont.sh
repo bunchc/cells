@@ -1,5 +1,4 @@
 source /vagrant/common.sh
-echo root:vagrant | chpasswd
 
 # Cell C1 Controller Build
 export CONTROLLER_HOST=172.16.0.102
