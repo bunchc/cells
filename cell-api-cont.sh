@@ -540,7 +540,9 @@ neutron_admin_tenant_name=service
 neutron_admin_username=neutron
 neutron_admin_password=neutron
 neutron_admin_auth_url=http://${MY_IP}:5000/v2.0
-libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
+libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtGenericVIFDriver
+#libvirt_vif_driver=LibvirtGenericVIFDriver
+#nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
 linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
 #firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
 security_group_api=neutron

@@ -318,6 +318,16 @@ rabbit_ha_queues = false
 # ============ Notification System Options =====================
 notification_driver = neutron.openstack.common.notifier.rpc_notifier
 
+# ======== neutron nova interactions ==========
+notify_nova_on_port_status_changes = True
+notify_nova_on_port_data_changes = True
+nova_url = http://${CONTROLLER_HOST}:8774/v2
+nova_region_name = regionOne
+nova_admin_username = ${NOVA_SERVICE_USER}
+nova_admin_tenant_id = ${SERVICE_TENANT_ID}
+nova_admin_password = ${NOVA_SERVICE_PASS}
+nova_admin_auth_url = http://${CONTROLLER_HOST}:35357/v2.0
+
 [agent]
 root_helper = sudo
 
@@ -456,7 +466,9 @@ neutron_admin_tenant_name=service
 neutron_admin_username=neutron
 neutron_admin_password=neutron
 neutron_admin_auth_url=http://${API_CONTROLLER}:5000/v2.0
-libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
+libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtGenericVIFDriver
+#libvirt_vif_driver=LibvirtGenericVIFDriver
+#libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
 linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
 #firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
 security_group_api=neutron
